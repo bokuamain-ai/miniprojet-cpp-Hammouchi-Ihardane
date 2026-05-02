@@ -1,32 +1,26 @@
 #include "StudentManager.h"
-#include <stdexcept>
+#include "../exceptions/StudentExceptions.h"
 #include <cctype>
 using namespace std;
 
 void StudentManager::add(shared_ptr<Student> s)
 {
     if (students.count(s->getId()))
-    {
-        throw runtime_error("ID deja utilise : " + to_string(s->getId()));
-    }
+        throw DuplicateIDException(s->getId());
     students[s->getId()] = s;
 }
 
 void StudentManager::remove(int id)
 {
     if (!students.count(id))
-    {
-        throw runtime_error("Etudiant introuvable avec ID : " + to_string(id));
-    }
+        throw StudentNotFoundException(id);
     students.erase(id);
 }
 
 void StudentManager::update(int id, shared_ptr<Student> updated)
 {
     if (!students.count(id))
-    {
-        throw runtime_error("Etudiant introuvable avec ID : " + to_string(id));
-    }
+        throw StudentNotFoundException(id);
     students[id] = updated;
 }
 
@@ -34,9 +28,7 @@ shared_ptr<Student> StudentManager::findById(int id) const
 {
     auto it = students.find(id);
     if (it == students.end())
-    {
-        throw runtime_error("Etudiant introuvable avec ID : " + to_string(id));
-    }
+        throw StudentNotFoundException(id);
     return it->second;
 }
 
@@ -52,9 +44,7 @@ vector<shared_ptr<Student>> StudentManager::findByName(const string &n) const
         for (char &c : nameLower)
             c = tolower(c);
         if (nameLower.find(nLower) != string::npos)
-        {
             result.push_back(pair.second);
-        }
     }
     return result;
 }
